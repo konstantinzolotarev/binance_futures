@@ -1,4 +1,4 @@
-defmodule BinanceFutures.Rest.MarketData do
+defmodule BinanceFutures.USDM.MarketData do
   @moduledoc """
   List of Market Data REST API's.
   """
@@ -10,7 +10,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.ping()
+      iex(1)> BinanceFutures.USDM.MarketData.ping()
       {:ok, %{}}
 
   """
@@ -23,7 +23,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.server_time()
+      iex(1)> BinanceFutures.USDM.MarketData.server_time()
       {:ok, 1616276229598}
 
   """
@@ -40,7 +40,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.exchange_info
+      iex(1)> BinanceFutures.USDM.MarketData.exchange_info
       {:ok,
         %{
           "exchangeFilters" => [],
@@ -80,7 +80,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.depth("BTCUSDT")
+      iex(1)> BinanceFutures.USDM.MarketData.depth("BTCUSDT")
       {:ok,
       %{
         "E" => 1616333020858,
@@ -112,7 +112,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.recent_trades("BTCUSDT", 2)
+      iex(1)> BinanceFutures.USDM.MarketData.recent_trades("BTCUSDT", 2)
       {:ok,
       [
         %{
@@ -143,7 +143,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.historical_trades("BTCUSDT", nil, 2)
+      iex(1)> BinanceFutures.USDM.MarketData.historical_trades("BTCUSDT", nil, 2)
       {:ok,
       [
         %{
@@ -183,7 +183,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.aggregate_trades("BTCUSDT", nil, nil, nil, 2)
+      iex(1)> BinanceFutures.USDM.MarketData.aggregate_trades("BTCUSDT", nil, nil, nil, 2)
       {:ok,
       [
         %{
@@ -232,7 +232,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.klines("BTCUSDT", "5m", nil, nil, 2)
+      iex(1)> BinanceFutures.USDM.MarketData.klines("BTCUSDT", "5m", nil, nil, 2)
       {:ok,
       [
         [1616338800000, "57212.69", "57315.00", "57196.19", "57300.00", "496.263",
@@ -274,7 +274,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.continuous_klines("BTCUSDT", "PERPETUAL", "5m", nil, nil, 2)
+      iex(1)> BinanceFutures.USDM.MarketData.continuous_klines("BTCUSDT", "PERPETUAL", "5m", nil, nil, 2)
       {:ok,
       [
         [1616340000000, "57480.91", "57490.00", "57372.26", "57405.05", "571.101",
@@ -318,7 +318,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.index_price_klines("BTCUSDT", "5m", nil, nil, 2)
+      iex(1)> BinanceFutures.USDM.MarketData.index_price_klines("BTCUSDT", "5m", nil, nil, 2)
       {:ok,
       [
         [1616340600000, "57366.98431599", "57429.73139441", "57284.92735200",
@@ -353,7 +353,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.mark_price_klines("BTCUSDT", "5m", nil, nil, 2)
+      iex(1)> BinanceFutures.USDM.MarketData.mark_price_klines("BTCUSDT", "5m", nil, nil, 2)
       {:ok,
       [
         [1616340900000, "57302", "57319.11709042", "57185.40000000",
@@ -388,7 +388,7 @@ defmodule BinanceFutures.Rest.MarketData do
 
   ## Example
 
-      iex(1)> BinanceFutures.Rest.MarketData.mark_price("BTCUSDT")
+      iex(1)> BinanceFutures.USDM.MarketData.mark_price("BTCUSDT")
       {:ok,
       %{
         "estimatedSettlePrice" => "57311.26556567",
@@ -400,7 +400,7 @@ defmodule BinanceFutures.Rest.MarketData do
         "symbol" => "BTCUSDT",
         "time" => 1616341403005
       }}
-      iex(2)> BinanceFutures.Rest.MarketData.mark_price()
+      iex(2)> BinanceFutures.USDM.MarketData.mark_price()
       {:ok,
       [
         %{
@@ -432,4 +432,49 @@ defmodule BinanceFutures.Rest.MarketData do
   @spec mark_price(nil | binary) :: {:ok, map} | {:ok, [map]} | HTTPClient.error()
   def mark_price(symbol \\ nil),
     do: HTTPClient.get("/fapi/v1/premiumIndex", %{"symbol" => symbol})
+
+            
+  @doc """
+  Gets Funding Rate History.
+
+  Additional API details:
+
+   - If startTime and endTime are not sent, the most recent limit datas are returned.
+   - If the number of data between startTime and endTime is larger than limit, return as startTime + limit.
+   - In ascending order.
+
+  If `symbol` will be omitted rates for all `symbols` will be returned.
+   
+  ## Example
+
+      iex(3)> BinanceFutures.USDM.MarketData.funding_rate("BNBUSDT")
+      {:ok,
+      [
+        %{
+          "fundingRate" => "-0.00149526",
+          "fundingTime" => 1601971200005,
+          "symbol" => "BNBUSDT"
+        },
+        %{
+          "fundingRate" => "-0.00081215",
+          "fundingTime" => 1602000000000,
+          "symbol" => "BNBUSDT"
+        },
+        %{"fundingRate" => "0.00000000", "fundingTime" => 1603267200004, ...},
+        %{"fundingRate" => "0.00000000", ...},
+        %{...},
+        ...
+      ]}
+
+  """
+  @spec funding_rate(nil | binary, nil | pos_integer, nil | pos_integer, pos_integer) :: {:ok, map} | {:ok, [map]} | HTTPClient.error()
+  def funding_rate(symbol \\ nil, start_time \\ nil, end_time \\ nil, limit \\ 500) do
+    params = %{
+      "symbol" => symbol,
+      "startTime" => start_time,
+      "endTime" => end_time,
+      "limit" => limit
+    }
+    HTTPClient.get("/fapi/v1/fundingRate", params)
+  end
 end

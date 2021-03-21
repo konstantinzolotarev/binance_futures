@@ -5,4 +5,5 @@ use Mix.Config
 config :binance_futures,
   api_key: "",
   secret_key: "",
-  end_point: "https://fapi.binance.com"
+  usdm_end_point: "https://fapi.binance.com",
+  coinm_end_point: "https://dapi.binance.com"

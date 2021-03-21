@@ -10,7 +10,7 @@ defmodule BinanceFutures.HTTPClient do
 
   @api_key Application.get_env(:binance_futures, :api_key, "")
   @secret_key Application.get_env(:binance_futures, :secret_key, "")
-  @endpoint Application.get_env(:binance_futures, :end_point)
+  @endpoint Application.get_env(:binance_futures, :usdm_end_point)
 
   @doc """
   Makes direct get request to Binance Futures API.

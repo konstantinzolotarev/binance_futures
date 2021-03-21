@@ -37,7 +37,7 @@ defmodule BinanceFutures.RateLimiter do
       :ok
 
   It will spend some on your `weight` limit by calling 
-  `BinanceFutures.Rest.MarketData.exchange_info/0` function.
+  `BinanceFutures.USDM.MarketData.exchange_info/0` function.
   But also will grab remainig rate limits for your account.
 
   After this call you will be able to keep track on remaining limits by using:
@@ -52,7 +52,7 @@ defmodule BinanceFutures.RateLimiter do
 
   use GenServer
 
-  alias BinanceFutures.Rest.MarketData
+  alias BinanceFutures.USDM.MarketData
 
   @weight_header "X-MBX-USED-WEIGHT-"
   @order_header "X-MBX-ORDER-COUNT-"
@@ -73,7 +73,7 @@ defmodule BinanceFutures.RateLimiter do
 
   @typedoc """
   Limits for `weight` and `orders` types that fetched from 
-  `BinanceFutures.Rest.MarketData.exchange_info/0`
+  `BinanceFutures.USDM.MarketData.exchange_info/0`
 
   ## Example
 
@@ -146,7 +146,7 @@ defmodule BinanceFutures.RateLimiter do
       
       iex(1)> BinanceFutures.RateLimiter.get_weight()
       %{}
-      iex(2)> BinanceFutures.Rest.MarketData.server_time()
+      iex(2)> BinanceFutures.USDM.MarketData.server_time()
       {:ok, 1616347174621}
       iex(3)> BinanceFutures.RateLimiter.get_weight()
       %{"1M" => 2}
@@ -162,7 +162,7 @@ defmodule BinanceFutures.RateLimiter do
 
   @doc """
   Fetches Binance Futures API limits.
-  Uses `BinanceFutures.Rest.MarketData.exchange_info/0` function for pulling information.
+  Uses `BinanceFutures.USDM.MarketData.exchange_info/0` function for pulling information.
 
   Returns `{:error, term}` in case of some issues with API call.
 
@@ -186,7 +186,7 @@ defmodule BinanceFutures.RateLimiter do
 
       iex(1)> BinanceFutures.RateLimiter.remaining()
       %{orders: %{}, weight: %{}}
-      iex(2)> BinanceFutures.Rest.MarketData.server_time()
+      iex(2)> BinanceFutures.USDM.MarketData.server_time()
       {:ok, 1616347615118}
       iex(3)> BinanceFutures.RateLimiter.remaining()
       %{orders: %{}, weight: %{}}
@@ -210,7 +210,7 @@ defmodule BinanceFutures.RateLimiter do
 
       iex(1)> BinanceFutures.RateLimiter.remaining_weight()
       %{}
-      iex(2)> BinanceFutures.Rest.MarketData.server_time()
+      iex(2)> BinanceFutures.USDM.MarketData.server_time()
       {:ok, 1616347833596}
       iex(3)> BinanceFutures.RateLimiter.remaining_weight()
       %{}
