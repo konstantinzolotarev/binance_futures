@@ -8,6 +8,8 @@ defmodule BinanceFutures.USDM.MarketData do
   @doc """
   Tests API Connectivity.
 
+  Weight: 1
+
   ## Example
 
       iex(1)> BinanceFutures.USDM.MarketData.ping()
@@ -20,6 +22,7 @@ defmodule BinanceFutures.USDM.MarketData do
 
   @doc """
   Gets Binance Futures API Server time.
+  Test connectivity to the Rest API and get the current server time.
 
   ## Example
 
@@ -37,6 +40,7 @@ defmodule BinanceFutures.USDM.MarketData do
 
   @doc """
   Gets current exchange trading rules and symbol information.
+  Current exchange trading rules and symbol information
 
   ## Example
 
@@ -433,7 +437,6 @@ defmodule BinanceFutures.USDM.MarketData do
   def mark_price(symbol \\ nil),
     do: HTTPClient.get("/fapi/v1/premiumIndex", %{"symbol" => symbol})
 
-            
   @doc """
   Gets Funding Rate History.
 
@@ -444,7 +447,7 @@ defmodule BinanceFutures.USDM.MarketData do
    - In ascending order.
 
   If `symbol` will be omitted rates for all `symbols` will be returned.
-   
+
   ## Example
 
       iex(3)> BinanceFutures.USDM.MarketData.funding_rate("BNBUSDT")
@@ -467,7 +470,8 @@ defmodule BinanceFutures.USDM.MarketData do
       ]}
 
   """
-  @spec funding_rate(nil | binary, nil | pos_integer, nil | pos_integer, pos_integer) :: {:ok, map} | {:ok, [map]} | HTTPClient.error()
+  @spec funding_rate(nil | binary, nil | pos_integer, nil | pos_integer, pos_integer) ::
+          {:ok, map} | {:ok, [map]} | HTTPClient.error()
   def funding_rate(symbol \\ nil, start_time \\ nil, end_time \\ nil, limit \\ 500) do
     params = %{
       "symbol" => symbol,
@@ -475,6 +479,443 @@ defmodule BinanceFutures.USDM.MarketData do
       "endTime" => end_time,
       "limit" => limit
     }
+
     HTTPClient.get("/fapi/v1/fundingRate", params)
   end
+
+  @doc """
+  Gets 24hr Ticker Price Change Statistics.
+
+  24 hour rolling window price change statistics.
+  Careful when accessing this with no symbol (has very big `weight`).
+
+  If the symbol is not sent, tickers for all symbols will be returned in an array.
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.ticker_24h("BTCUSDT")
+      {:ok,
+      %{
+        "closeTime" => 1616437801503,
+        "count" => 2829671,
+        "firstId" => 626470086,
+        "highPrice" => "58500.00",
+        "lastId" => 629299761,
+        "lastPrice" => "57028.37",
+        "lastQty" => "0.025",
+        "lowPrice" => "56243.00",
+        "openPrice" => "57325.02",
+        "openTime" => 1616351400000,
+        "priceChange" => "-296.65",
+        "priceChangePercent" => "-0.517",
+        "quoteVolume" => "13059748167.78",
+        "symbol" => "BTCUSDT",
+        "volume" => "227696.666",
+        "weightedAvgPrice" => "57355.90"
+      }}
+
+  """
+  @spec ticker_24h(nil | binary) :: {:ok, map} | {:ok, [map]} | HTTPClient.error()
+  def ticker_24h(symbol \\ nil),
+    do: HTTPClient.get("/fapi/v1/ticker/24hr", %{"symbol" => symbol})
+
+  @doc """
+  Gets Symbol Price Ticker.
+  Latest price for a symbol or symbols.
+
+  If the symbol is not sent, prices for all symbols will be returned in an array.
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.ticker_price("BTCUSDT")
+      {:ok, %{"price" => "56832.56", "symbol" => "BTCUSDT", "time" => 1616437944238}}
+
+  """
+  @spec ticker_price(nil | binary) :: {:ok, map} | {:ok, [map]} | HTTPClient.error()
+  def ticker_price(symbol \\ nil),
+    do: HTTPClient.get("/fapi/v1/ticker/price", %{"symbol" => symbol})
+
+  @doc """
+  Gets Symbol Order Book Ticker.  
+  Best price/qty on the order book for a symbol or symbols.
+
+  If the symbol is not sent, bookTickers for all symbols will be returned in an array.
+
+  ## Example
+
+      iex(7)> BinanceFutures.USDM.MarketData.ticker_book("BTCUSDT")
+      {:ok,
+      %{
+        "askPrice" => "56685.27",
+        "askQty" => "0.077",
+        "bidPrice" => "56683.18",
+        "bidQty" => "1.392",
+        "symbol" => "BTCUSDT",
+        "time" => 1616438105137
+      }}
+
+  """
+  @spec ticker_book(nil | binary) :: {:ok, map} | {:ok, [map]} | HTTPClient.error()
+  def ticker_book(symbol \\ nil),
+    do: HTTPClient.get("/fapi/v1/ticker/bookTicker", %{"symbol" => symbol})
+
+  @doc """
+  Gets all Liquidation Orders.
+
+  If the symbol is not sent, liquidation orders for all symbols will be returned.
+  The query time period must be within the recent 7 days.
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.all_force_orders("BTCUSDT", nil, nil, 1)
+      {:ok,
+      [
+        %{
+          "averagePrice" => "56560.35",
+          "executedQty" => "0.002",
+          "origQty" => "0.002",
+          "price" => "56316.25",
+          "side" => "SELL",
+          "status" => "FILLED",
+          "symbol" => "BTCUSDT",
+          "time" => 1616438506969,
+          "timeInForce" => "IOC",
+          "type" => "LIMIT"
+        }
+      ]}
+
+  """
+  @spec all_force_orders(nil | binary, nil | pos_integer, nil | pos_integer, pos_integer) ::
+          {:ok, [map]} | HTTPClient.error()
+  def all_force_orders(symbol \\ nil, start_time \\ nil, end_time \\ nil, limit \\ 100) do
+    params = %{
+      "symbol" => symbol,
+      "startTime" => start_time,
+      "endTime" => end_time,
+      "limit" => limit
+    }
+
+    HTTPClient.get("/fapi/v1/allForceOrders", params)
+  end
+
+  @doc """
+  Gets present open interest of a specific symbol.
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.open_interest("BTCUSDT")
+      {:ok,
+      %{
+        "openInterest" => "33877.933",
+        "symbol" => "BTCUSDT",
+        "time" => 1616438337232
+      }}
+
+  """
+  @spec open_interest(binary) :: {:ok, map} | HTTPClient.error()
+  def open_interest(symbol),
+    do: HTTPClient.get("/fapi/v1/openInterest?symbol=#{symbol}")
+
+  @doc """
+  Gets Open Interest Statistics.
+
+  If startTime and endTime are not sent, the most recent data is returned.
+  Only the data of the latest 30 days is available.
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.open_interest_hist("BTCUSDT", "5m", nil, nil, 1)
+      {:ok,
+      [
+        %{
+          "sumOpenInterest" => "34085.00000000",
+          "sumOpenInterestValue" => "1927265695.27131325",
+          "symbol" => "BTCUSDT",
+          "timestamp" => 1616438700000
+        }
+      ]}
+
+  """
+  @spec open_interest_hist(
+          binary,
+          BinanceFutures.interval(),
+          nil | pos_integer,
+          nil | pos_integer,
+          pos_integer
+        ) :: {:ok, [map]} | HTTPClient.error()
+  def open_interest_hist(symbol, interval \\ nil, start_time \\ nil, end_time \\ nil, limit \\ 30) do
+    params = %{
+      "symbol" => symbol,
+      "period" => interval,
+      "startTime" => start_time,
+      "endTime" => end_time,
+      "limit" => limit
+    }
+
+    HTTPClient.get("/futures/data/openInterestHist", params)
+  end
+
+  @doc """
+  Gets Top Trader Long/Short Ratio (Accounts).
+
+  If startTime and endTime are not sent, the most recent data is returned.
+  Only the data of the latest 30 days is available.
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.top_long_short_account_ratio("BTCUSDT", "5m", nil, nil, 1)
+      {:ok,
+      [
+        %{
+          "longAccount" => "0.7739",
+          "longShortRatio" => "3.4228",
+          "shortAccount" => "0.2261",
+          "symbol" => "BTCUSDT",
+          "timestamp" => 1616439000000
+        }
+      ]}
+
+  """
+  @spec top_long_short_account_ratio(
+          binary,
+          BinanceFutures.interval(),
+          nil | pos_integer,
+          nil | pos_integer,
+          pos_integer
+        ) :: {:ok, [map]} | HTTPClient.error()
+  def top_long_short_account_ratio(
+        symbol,
+        interval,
+        start_time \\ nil,
+        end_time \\ nil,
+        limit \\ 30
+      ) do
+    params = %{
+      "symbol" => symbol,
+      "period" => interval,
+      "startTime" => start_time,
+      "endTime" => end_time,
+      "limit" => limit
+    }
+
+    HTTPClient.auth_get("/futures/data/topLongShortAccountRatio", params)
+  end
+
+  @doc """
+  Gets Top Trader Long/Short Ratio (Positions).
+
+  If startTime and endTime are not sent, the most recent data is returned.
+  Only the data of the latest 30 days is available.
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.top_long_short_position_ratio("BTCUSDT", "5m", nil, nil, 1)
+      {:ok,
+        [
+          %{
+            "longAccount" => "0.5482",
+            "longShortRatio" => "1.2131",
+            "shortAccount" => "0.4518",
+            "symbol" => "BTCUSDT",
+            "timestamp" => 1616439300000
+          }
+        ]}
+
+  """
+  @spec top_long_short_position_ratio(
+          binary,
+          BinanceFutures.interval(),
+          nil | pos_integer,
+          nil | pos_integer,
+          pos_integer
+        ) :: {:ok, [map]} | HTTPClient.error()
+  def top_long_short_position_ratio(
+        symbol,
+        interval,
+        start_time \\ nil,
+        end_time \\ nil,
+        limit \\ 30
+      ) do
+    params = %{
+      "symbol" => symbol,
+      "period" => interval,
+      "startTime" => start_time,
+      "endTime" => end_time,
+      "limit" => limit
+    }
+
+    HTTPClient.get("/futures/data/topLongShortPositionRatio", params)
+  end
+
+  @doc """
+  Gets global Long/Short Ratio.
+
+  If startTime and endTime are not sent, the most recent data is returned.
+  Only the data of the latest 30 days is available.
+
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.global_long_short_account_ratio("BTCUSDT", "5m", nil, nil, 1)
+      {:ok,
+      [
+        %{
+          "longAccount" => "0.7895",
+          "longShortRatio" => "3.7506",
+          "shortAccount" => "0.2105",
+          "symbol" => "BTCUSDT",
+          "timestamp" => 1616439600000
+        }
+      ]}
+
+  """
+  @spec global_long_short_account_ratio(
+          binary,
+          BinanceFutures.interval(),
+          nil | pos_integer,
+          nil | pos_integer,
+          pos_integer
+        ) :: {:ok, [map]} | HTTPClient.error()
+  def global_long_short_account_ratio(
+        symbol,
+        interval,
+        start_time \\ nil,
+        end_time \\ nil,
+        limit \\ 30
+      ) do
+    params = %{
+      "symbol" => symbol,
+      "period" => interval,
+      "startTime" => start_time,
+      "endTime" => end_time,
+      "limit" => limit
+    }
+
+    HTTPClient.get("/futures/data/globalLongShortAccountRatio", params)
+  end
+
+  @doc """
+  Gets Taker Long/Short Ratio.
+
+  If startTime and endTime are not sent, the most recent data is returned.
+  Only the data of the latest 30 days is available.
+
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.taker_long_short_ratio("BTCUSDT", "5m", nil, nil, 1)
+      {:ok,
+      [
+        %{
+          "buySellRatio" => "1.1603",
+          "buyVol" => "298.2800",
+          "sellVol" => "257.0660",
+          "timestamp" => 1616439300000
+        }
+      ]}
+
+  """
+  @spec taker_long_short_ratio(
+          binary,
+          BinanceFutures.interval(),
+          nil | pos_integer,
+          nil | pos_integer,
+          pos_integer
+        ) :: {:ok, [map]} | HTTPClient.error()
+  def taker_long_short_ratio(
+        symbol,
+        interval,
+        start_time \\ nil,
+        end_time \\ nil,
+        limit \\ 30
+      ) do
+    params = %{
+      "symbol" => symbol,
+      "period" => interval,
+      "startTime" => start_time,
+      "endTime" => end_time,
+      "limit" => limit
+    }
+
+    HTTPClient.get("/futures/data/takerlongshortRatio", params)
+  end
+
+  @doc """
+  Gets the BLVT NAV system is based on Binance Futures, so the endpoint is based on fapi.
+
+  **Symbol** here is not as everywhere.
+  Here `symbol` means TOKEN_NAME + `DOWN`|`UP`
+  Example: `BTCDOWN` or `BTCUP`
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.lvt_klines("BTCDOWN", "5m", nil, nil, 1)
+      {:ok,
+      [
+        [1616439900000, "0.05134788", "0.05217493", "0.05113578", "0.05186245",
+          "2.56527976", 1616440199999, "0", 274, "703.56900864", "0", "0"]
+      ]}
+
+  """
+  @spec lvt_klines(
+          binary,
+          BinanceFutures.interval(),
+          nil | pos_integer,
+          nil | pos_integer,
+          pos_integer
+        ) :: {:ok, [map]} | HTTPClient.error()
+  def lvt_klines(
+        symbol,
+        interval,
+        start_time \\ nil,
+        end_time \\ nil,
+        limit \\ 30
+      ) do
+    params = %{
+      "symbol" => symbol,
+      "interval" => interval,
+      "startTime" => start_time,
+      "endTime" => end_time,
+      "limit" => limit
+    }
+
+    HTTPClient.get("/fapi/v1/lvtKlines", params)
+  end
+
+  @doc """
+  Gets Composite Index Symbol Information.
+
+  Only for composite index symbols.
+
+  ## Example
+
+      iex(1)> BinanceFutures.USDM.MarketData.index_info("DEFIUSDT")
+      {:ok,
+      %{
+        "baseAssetList" => [
+          %{
+            "baseAsset" => "1INCH",
+            "weightInPercentage" => "0.03031300",
+            "weightInQuantity" => "16.58633812"
+          },
+          %{
+            "baseAsset" => "AAVE",
+            "weightInPercentage" => "0.05795000",
+            "weightInQuantity" => "0.40345195"
+          },
+          ...
+          %{
+            "baseAsset" => "ZRX",
+            "weightInPercentage" => "0.02559600",
+            "weightInQuantity" => "42.58378099"
+          }
+        ],
+        "symbol" => "DEFIUSDT",
+        "time" => 1616440368000
+      }}
+
+  """
+  @spec index_info(nil | binary) :: {:ok, [map]} | HTTPClient.error()
+  def index_info(symbol \\ nil),
+    do: HTTPClient.get("/fapi/v1/indexInfo", %{"symbol" => symbol})
 end
